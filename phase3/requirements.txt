@@ -11,6 +11,7 @@ groq==0.13.0
 # Tools
 duckduckgo-search==6.3.7
 wikipedia==1.4.0
+lxml
 
 # Memory - Vector Store
 chromadb==0.5.23

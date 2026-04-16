@@ -116,8 +116,8 @@ def build_agent():
         tools=tools,
         verbose=False,              # Set True to see full Thought/Action trace
         handle_parsing_errors=True,
-        max_iterations=6,
-        max_execution_time=45,
+        max_iterations=10,
+        max_execution_time=60,
     ), tools
 
 

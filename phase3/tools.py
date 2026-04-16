@@ -29,7 +29,7 @@ def get_search_tool() -> Tool:
     LangChain Tool wrapping DuckDuckGo search.
     The agent uses this when it needs up-to-date information from the web.
     """
-    search = DuckDuckGoSearchRun()
+    search = DuckDuckGoSearchRun(backend="html")
     return Tool(
         name="web_search",
         func=search.run,
