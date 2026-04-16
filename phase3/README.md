@@ -1,44 +1,76 @@
-# 🔬 Phase 3: AI Research Assistant
-### Advanced LangChain Concepts — Agents, Tools & Memory
+# AI Research Assistant — Phase 3
 
-> **Powered by:** Groq API (LLaMA 3 70B) + LangChain ReAct Agent + DuckDuckGo + SQLite
+> **A fully functional CLI research assistant built with LangChain, Groq LLaMA 3.3, and ReAct agents.**
+
+![Python](https://img.shields.io/badge/Python-3.12-blue?style=flat-square&logo=python)
+![LangChain](https://img.shields.io/badge/LangChain-0.3.14-green?style=flat-square)
+![Groq](https://img.shields.io/badge/Groq-LLaMA_3.3_70B-orange?style=flat-square)
+![SQLite](https://img.shields.io/badge/Database-SQLite-lightblue?style=flat-square&logo=sqlite)
 
 ---
 
-## 📁 Project Structure
+## What This Does
+
+A production-like AI assistant that answers your questions using **live web search**, **Wikipedia**, a **calculator**, and **real-time date/time** — all decided automatically by a ReAct agent.
 
 ```
-Langchain_roadmap_3/
-├── app.py              # Main CLI Research Assistant (run this!)
-├── agents.py           # ReAct, Zero-shot & Self-ask Agent demos
-├── memory.py           # Buffer, Entity & Vector Memory demos
-├── tools.py            # Web search, Wikipedia, Calculator, Datetime tools
-├── requirements.txt    # Python dependencies
-├── .env.example        # Environment config template
-├── research_history.db # SQLite history (auto-created on first run)
+You:  What is the current petrol price in Pakistan?
+
+  🤔 Researching...
+
+  Thought:     I need to search for the latest petrol price in Pakistan.
+  Action:      web_search("current petrol price Pakistan 2026")
+  Observation: The current petrol price is Rs. 366/liter — OGRA, April 2026
+  Thought:     I have enough information.
+  Final Answer: The current petrol price in Pakistan is Rs. 366 per liter.
+```
+
+---
+
+## Project Structure
+
+```
+phase3/
+│
+├── app.py                  ← Main CLI app (run this)
+├── agents.py               ← ReAct, Zero-shot & Self-ask agent demos
+├── memory.py               ← Buffer, Entity & Vector memory demos
+├── tools.py                ← Web search, Wikipedia, Calculator, Datetime
+├── requirements.txt        ← All dependencies
+├── .env.example            ← API key template
+│
 └── notebooks/
-    ├── 01_agents.ipynb # Learn: What are agents? ReAct pattern
-    ├── 02_tools.ipynb  # Learn: Tools, APIs, DB integration
-    └── 03_memory.ipynb # Learn: Memory types and implementation
+    ├── 01_agents.ipynb     ← Learn: What are agents? ReAct pattern
+    ├── 02_tools.ipynb      ← Learn: Tools, APIs, DB integration
+    └── 03_memory.ipynb     ← Learn: Memory types & implementation
 ```
 
 ---
 
 ## Quick Start
 
-### 1. Install dependencies
+### 1. Clone & install dependencies
+
 ```bash
-cd /home/bakar/Desktop/Langchain_roadmap_3
+git clone https://github.com/Abubakar651/langchain-roadmap.git
+cd langchain-roadmap/phase3
 pip install -r requirements.txt
 ```
 
-### 2. Set your Groq API key
+### 2. Set up your API key
+
 ```bash
 cp .env.example .env
-# Edit .env and paste your key from https://console.groq.com
 ```
 
-### 3. Run the Research Assistant
+Then open `.env` and add your free Groq API key from [console.groq.com](https://console.groq.com):
+
+```env
+GROQ_API_KEY=your_key_here
+```
+
+### 3. Run the assistant
+
 ```bash
 python app.py
 ```
@@ -48,111 +80,143 @@ python app.py
 ## App Commands
 
 | Command | Description |
-|---|---|
-| `/history` | View last 10 Q&A pairs from SQLite |
-| `/memory` | Show current conversation memory |
-| `/clear` | Clear memory (fresh conversation) |
-| `/verbose` | Toggle agent reasoning trace |
-| `/quit` | Exit |
+|:--------|:------------|
+| `Any question` | Ask the agent anything |
+| `/history` | View last 10 Q&A pairs stored in SQLite |
+| `/memory` | Show current conversation context |
+| `/clear` | Clear memory and start fresh |
+| `/verbose` | Toggle agent reasoning trace on/off |
+| `/help` | Show all commands |
+| `/quit` | Exit the assistant |
 
 ---
 
-## Learning Path
+## Tools Available to the Agent
 
-| File | Topic | Key Concepts |
-|---|---|---|
-| `notebooks/01_agents.ipynb` | Agents | ReAct, Zero-shot, Self-ask patterns |
-| `notebooks/02_tools.ipynb` | Tools | Web search, APIs, SQL, custom tools |
-| `notebooks/03_memory.ipynb` | Memory | Buffer, Entity, Vector memory types |
-| `tools.py` | Tools code | 4 production-quality tool implementations |
-| `memory.py` | Memory code | 3 memory type demos with runnable examples |
-| `agents.py` | Agent code | ReAct agent builder + conceptual demos |
-| `app.py` | Full app | Agent + Memory + SQLite integrated |
+| Tool | Source | When the agent uses it |
+|:-----|:-------|:----------------------|
+| `web_search` | DuckDuckGo — free, no key | Current events, prices, news |
+| `wikipedia` | Wikipedia API — free, no key | Factual & encyclopedic questions |
+| `calculator` | Custom Python | Any math expression |
+| `current_datetime` | Custom Python | Date/time awareness |
 
 ---
 
 ## How It Works
 
 ```
-User Question
-     │
-     ▼
-ConversationBufferMemory  ──►  Injects past conversation context
-     │
-     ▼
-ReAct Agent (LLaMA 3 70B via Groq)
-     │
-     ├── Thought: "I need to search for X"
-     ├── Action: web_search("X")
-     ├── Observation: [search results]
-     ├── Thought: "Now I have enough info"
-     └── Final Answer: "..."
-     │
-     ▼
-Save to SQLite (research_history.db)
-Save to In-Memory Buffer (for context)
+                    ┌─────────────────────────────┐
+   User Question ──►│  ConversationBufferMemory   │
+                    │  (injects chat history)      │
+                    └────────────┬────────────────┘
+                                 │
+                                 ▼
+                    ┌─────────────────────────────┐
+                    │   ReAct Agent               │
+                    │   LLaMA 3.3 70B via Groq    │
+                    │                             │
+                    │  Thought → Action → Observe │
+                    │  Thought → Action → Observe │
+                    │  ...                        │
+                    │  Final Answer               │
+                    └────────────┬────────────────┘
+                                 │
+                    ┌────────────▼────────────────┐
+                    │  Save to SQLite             │
+                    │  Save to Memory Buffer      │
+                    └─────────────────────────────┘
 ```
 
 ---
 
-## Tools Available to the Agent
+## Memory Types Demonstrated
 
-| Tool | Source | Use Case |
-|---|---|---|
-| `web_search` | DuckDuckGo (free) | Current events, news |
-| `wikipedia` | Wikipedia API (free) | Factual/encyclopedic info |
-| `calculator` | Custom Python | Math expressions |
-| `current_datetime` | Custom Python | Date/time awareness |
+| Type | How it works | Best for |
+|:-----|:-------------|:---------|
+| `ConversationBufferMemory` | Stores every message verbatim | Short sessions, chatbots |
+| `ConversationEntityMemory` | Extracts named entities via LLM | Personal assistants, CRM bots |
+| `VectorStoreRetrieverMemory` | Semantic search over past messages | Long-term memory, large history |
 
 ---
 
-## Demo: Running individual modules
+## Run Individual Modules
 
 ```bash
-# Test tools independently
+# Test all 4 tools independently
 python tools.py
 
-# Demo all memory types
+# Demo all 3 memory types
 python memory.py
 
-# Demo agents with tool use
+# Demo ReAct agent with tool use
 python agents.py
 ```
 
 ---
 
-## Phase 3 Topics Covered
+## Topics Covered
 
-### LangChain Agents
-- What are Agents? How do they differ from plain LLM chains?
-- Agent Types: ReAct, Zero-shot, Self-ask (conceptual + code)
-- Creating agents with `create_react_agent` + `AgentExecutor`
-- Tool description engineering (the key to agent performance)
+<details>
+<summary><strong>LangChain Agents</strong></summary>
 
-### Integrating External Tools
-- DuckDuckGo Search (no API key needed)
-- Wikipedia integration
-- Custom Python tool creation
-- SQLite database integration
-- REST API integration (CoinGecko example in notebook)
+- What are Agents and how they differ from plain LLM chains
+- Agent types: ReAct, Zero-shot, Self-ask (conceptual + runnable code)
+- Building agents with `create_react_agent` + `AgentExecutor`
+- Tool description engineering — the key to agent performance
 
-### LangChain Memory
-- `ConversationBufferMemory` — full verbatim history
+</details>
+
+<details>
+<summary><strong>Integrating External Tools</strong></summary>
+
+- DuckDuckGo Search via `ddgs` (no API key needed)
+- Wikipedia integration with `WikipediaAPIWrapper`
+- Custom Python tools (calculator, datetime)
+- SQLite database integration with SQLAlchemy
+- REST API integration — CoinGecko example in `02_tools.ipynb`
+
+</details>
+
+<details>
+<summary><strong>LangChain Memory</strong></summary>
+
+- `ConversationBufferMemory` — full verbatim conversation history
 - `ConversationEntityMemory` — structured entity extraction
-- `VectorStoreRetrieverMemory` — semantic long-term memory
-- How memory integrates with ReAct agents
+- `VectorStoreRetrieverMemory` — semantic long-term memory with ChromaDB
+- How memory integrates with ReAct agents in a real app
+
+</details>
 
 ---
 
-## Dependencies
+## Tech Stack
+
+| Package | Purpose |
+|:--------|:--------|
+| `langchain` + `langchain-community` | Agent framework |
+| `langchain-groq` | Groq LLM integration |
+| `groq` | LLaMA 3.3 70B inference |
+| `ddgs` | DuckDuckGo web search |
+| `wikipedia` | Wikipedia API |
+| `chromadb` + `langchain-chroma` | Vector store for memory |
+| `sentence-transformers` | Free local embeddings |
+| `sqlalchemy` | SQLite ORM for history |
+| `python-dotenv` | Environment variable management |
+
+---
+
+## Learning Path
+
+Start here if you're learning:
 
 ```
-langchain + langchain-groq + langchain-community  # Core
-groq                                               # Groq API client
-duckduckgo-search                                  # Free web search
-wikipedia                                          # Wikipedia API
-chromadb + langchain-chroma                        # Vector store
-sentence-transformers                              # Free embeddings
-sqlalchemy                                         # SQLite ORM
-python-dotenv                                      # .env support
+01_agents.ipynb  →  02_tools.ipynb  →  03_memory.ipynb  →  app.py
+   (concepts)         (tools)            (memory)          (full app)
 ```
+
+---
+
+## Part of the LangChain Roadmap
+
+This is **Phase 3** of a multi-phase LangChain learning series.
+Check the [full roadmap repo](https://github.com/Abubakar651/langchain-roadmap) for all phases.
