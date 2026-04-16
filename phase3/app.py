@@ -103,7 +103,7 @@ def build_agent():
     from tools import get_all_tools
 
     llm = ChatGroq(
-        model="llama3-70b-8192",
+        model="llama-3.3-70b-versatile",
         temperature=0.3,
         groq_api_key=GROQ_API_KEY,
     )

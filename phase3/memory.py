@@ -26,7 +26,7 @@ load_dotenv()
 # ─── Shared LLM ──────────────────────────────────────────────────────────────
 def _get_llm():
     return ChatGroq(
-        model="llama3-70b-8192",
+        model="llama-3.3-70b-versatile",
         temperature=0.3,
         groq_api_key=os.getenv("GROQ_API_KEY"),
     )
@@ -97,6 +97,11 @@ class EntityMemoryDemo:
     """
 
     def __init__(self):
+        from langchain_core.caches import BaseCache
+        from langchain_core.callbacks.base import Callbacks
+        ConversationEntityMemory.model_rebuild(
+            _types_namespace={"BaseCache": BaseCache, "Callbacks": Callbacks}
+        )
         self.memory = ConversationEntityMemory(
             llm=_get_llm(),
             return_messages=True,
