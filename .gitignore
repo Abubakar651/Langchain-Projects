@@ -1,0 +1,19 @@
+# Virtual environment
+venv/
+
+# Environment variables (keep API keys private)
+.env
+
+# FAISS index (regenerated from PDFs)
+project/faiss_index/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Sample docs (optional — uncomment if PDFs are large)
+# sample_docs/
+
+# OS files
+.DS_Store
